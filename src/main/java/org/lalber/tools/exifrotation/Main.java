@@ -19,6 +19,7 @@ public class Main {
 
     private static Thread processingThread;
     private static boolean aborted;
+    private static boolean finished;
 
     /**
      * Main entry point to application.
@@ -47,17 +48,19 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e) {
-                if (JOptionPane.showConfirmDialog(frame, "Abort and Close?") == 0) {
-                    aborted = true;
-                    if (processingThread != null) {
-                        try {
-                            processingThread.join();
-                        } catch (InterruptedException e1) {
-                            e1.printStackTrace();
+                if (!finished) {
+                    if (JOptionPane.showConfirmDialog(frame, "Abort and Close?") == 0) {
+                        aborted = true;
+                        if (processingThread != null) {
+                            try {
+                                processingThread.join();
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
                         }
+                        System.exit(0);
                     }
-                    System.exit(0);
-                }
+                } else System.exit(0);
             }
         });
 
@@ -84,6 +87,7 @@ public class Main {
                 e.printStackTrace();
             }
 
+            finished = true;
             textArea.append("FINISHED!");
         });
 
