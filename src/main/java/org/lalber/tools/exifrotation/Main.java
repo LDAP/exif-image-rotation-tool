@@ -1,9 +1,12 @@
 package org.lalber.tools.exifrotation;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -13,6 +16,9 @@ import javaxt.io.Image;
  * @author Lucas Alber
  */
 public class Main {
+
+    private static Thread processingThread;
+    private static boolean aborted;
 
     /**
      * Main entry point to application.
@@ -38,26 +44,48 @@ public class Main {
         frame.add(mainPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);
+
+        frame.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e) {
+                if (JOptionPane.showConfirmDialog(frame, "Abort and Close?") == 0) {
+                    aborted = true;
+                    if (processingThread != null) {
+                        try {
+                            processingThread.join();
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                    System.exit(0);
+                }
+            }
+        });
+
         frame.setVisible(true);
 
-        try {
-            Files.walk(folder.toPath())
-                    .filter(Main::isImage)
+        processingThread = new Thread(() -> {
+            try {
+                Files.walk(folder.toPath())
+                        .filter(Main::isImage)
                         .collect(Collectors.toList())
                         .parallelStream()
-                    .forEach(p -> {
-                        textArea.append("Processing: " + p.getFileName().toString() + "\n");
-                        Image img = new Image(p.toFile());
-                        img.rotate();
-                        img.saveAs(p.toFile());
-                    });
+                        .forEach(p -> {
+                            if (aborted) return;
+                            textArea.append("Processing: " + p.getFileName().toString() + "\n");
+                            Image img = new Image(p.toFile());
+                            img.rotate();
+                            img.saveAs(p.toFile());
+                        });
 
-        } catch (IOException e) {
-            System.err.println("Error processing images!");
-            e.printStackTrace();
-        }
+            } catch (IOException e) {
+                System.err.println("Error processing images!");
+                e.printStackTrace();
+            }
 
-        textArea.append("FINISHED!");
+            textArea.append("FINISHED!");
+        });
+
+        processingThread.start();
     }
 
     /**
