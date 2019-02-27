@@ -32,7 +32,7 @@ public class Main {
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(new TitledBorder(new EtchedBorder(), "Process:"));
 
-        JTextArea textArea = new JTextArea(16, 58);
+        final JTextArea textArea = new JTextArea(16, 58);
         textArea.setEditable(false);
         JScrollPane scroll = new JScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -71,7 +71,9 @@ public class Main {
                         .parallelStream()
                         .forEach(p -> {
                             if (aborted) return;
-                            textArea.append("Processing: " + p.getFileName().toString() + "\n");
+                            synchronized (textArea) {
+                                textArea.append("Processing: " + p.getFileName().toString() + "\n");
+                            }
                             Image img = new Image(p.toFile());
                             img.rotate();
                             img.saveAs(p.toFile());
