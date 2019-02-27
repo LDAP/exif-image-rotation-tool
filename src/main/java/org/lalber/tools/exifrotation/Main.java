@@ -44,7 +44,7 @@ public class Main {
         frame.add(mainPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);
-
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e) {
                 if (JOptionPane.showConfirmDialog(frame, "Abort and Close?") == 0) {
