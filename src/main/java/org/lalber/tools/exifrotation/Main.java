@@ -43,6 +43,8 @@ public class Main {
         try {
             Files.walk(folder.toPath())
                     .filter(Main::isImage)
+                        .collect(Collectors.toList())
+                        .parallelStream()
                     .forEach(p -> {
                         textArea.append("Processing: " + p.getFileName().toString() + "\n");
                         Image img = new Image(p.toFile());
