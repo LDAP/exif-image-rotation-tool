@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 import javaxt.io.Image;
 
 /**
@@ -35,6 +36,8 @@ public class Main {
 
         final JTextArea textArea = new JTextArea(16, 58);
         textArea.setEditable(false);
+        DefaultCaret caret = (DefaultCaret) textArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane scroll = new JScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
