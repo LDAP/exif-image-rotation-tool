@@ -52,7 +52,8 @@ public class Main {
         frame.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e) {
                 if (!finished) {
-                    if (JOptionPane.showConfirmDialog(frame, "Abort?") == 0) {
+                    if (JOptionPane.showConfirmDialog(frame, "Are you sure to abort the operation?",
+                            "Abort?", JOptionPane.YES_NO_OPTION) == 0) {
                         aborted = true;
                         if (processingThread != null) {
                             try {
